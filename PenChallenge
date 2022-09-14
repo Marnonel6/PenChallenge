@@ -243,7 +243,10 @@ try:
                 # print(depth_coords)
         """ David """
 
-        
+
+
+
+        """
         # #cv.imshow('frame',color_image)
         cv.imshow('bg_removed',bg_removed)
         cv.imshow('mask',mask)
@@ -253,6 +256,9 @@ try:
         # #if k == 27:
         # #    break
         # #cv.destroyAllWindows()
+        """
+
+
 
 
         """
@@ -317,6 +323,17 @@ try:
 
         cv.namedWindow('Align Example', cv.WINDOW_NORMAL)
         cv.imshow('Align Example', images)
+
+
+        images2 = np.hstack((bg_removed, res))
+        images3 = np.hstack((mask, thresh))
+        cv.namedWindow('bg_removed & mask', cv.WINDOW_NORMAL)
+        cv.imshow('bg_removed & mask', images2)
+        cv.namedWindow('thresh & res', cv.WINDOW_NORMAL)
+        cv.imshow('thresh & res', images3)
+
+
+
         key = cv.waitKey(1)
         # Press esc or 'q' to close the image window
         if key & 0xFF == ord('q') or key == 27:
