@@ -10,12 +10,19 @@ mode = 'h'
 
 #print(robot.arm.get_joint_commands())
 
-""" # Rotatioin matrix
+# Rotatioin matrix
 joints = robot.arm.get_joint_commands()
 T = mr.FKinSpace(robot.arm.robot_des.M, robot.arm.robot_des.Slist, joints)
 [R, p] = mr.TransToRp(T) # get the rotation matrix and the displacement
 print('T = ', T, '\n R = ', R, '\n p = ', p)
-"""
+
+def get_gripper_pos():
+    # Rotatioin matrix
+    joints = robot.arm.get_joint_commands()
+    T = mr.FKinSpace(robot.arm.robot_des.M, robot.arm.robot_des.Slist, joints)
+    [R, p] = mr.TransToRp(T) # get the rotation matrix and the displacement
+    return [R, p]
+
 
 joint_positions = [0.0, 0.0, 0.0, 0.0] # [waist,shoulder,elbow,wrist]
 Home_pose = [0.0, 0.0, 0.0, 0.0]
@@ -23,7 +30,7 @@ Cobra_pose = [-1.0, -1.0, -1.0, 2.0]
 # joint_positions = [-1.0, -1.0, -1.0, 2.0] # Do the Cobra
 # Let the user select the position
 while mode != 'q':
-    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [all], [cobra]")
+    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [all], [cobra], [cb], [acb], [cart]")
     if mode == "h":
         robot.arm.go_to_home_pose()
     elif mode == "s":
@@ -32,10 +39,14 @@ while mode != 'q':
         robot.gripper.grasp()
     elif mode == "r":
         robot.gripper.release()
-    # elif mode == "cb":
-    #     robot.arm.set_single_joint_position('waist',-1.5)
-    # elif mode == "acb":
-    #     robot.arm.set_single_joint_position('waist',1.5, moving_time=2)
+    elif mode == "cb":
+         robot.arm.set_single_joint_position('waist',-1.5)
+         [R, p] = get_gripper_pos()
+         print('\n p = ', p)
+    elif mode == "acb":
+         robot.arm.set_single_joint_position('waist',1.5, moving_time=2)
+         [R, p] = get_gripper_pos()
+         print('\n p = ', p)
     # elif mode == "wu":
     #     robot.arm.set_single_joint_position('wrist_angle',-1.0)
     # elif mode == "wd":
@@ -47,6 +58,15 @@ while mode != 'q':
     elif mode == "all":
         joint_positions = Home_pose
         robot.arm.set_joint_positions(joint_positions,3) 
+        #print('T = ', T, '\n R = ', R, '\n p = ', p)
+        [R, p] = get_gripper_pos()
+        print('\n p = ', p)
     elif mode == "cobra":
         joint_positions = Cobra_pose
         robot.arm.set_joint_positions(joint_positions,3) 
+        print('T = ', T, '\n R = ', R, '\n p = ', p)
+    elif mode == "cart":
+        robot.arm.set_ee_cartesian_trajectory(x = 0.030, z = 0.02 ) # Values should be meter/10
+        [R, p] = get_gripper_pos()
+        print('\n p = ', p)
+    
