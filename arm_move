@@ -1,13 +1,25 @@
+from pickle import TRUE
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+import modern_robotics as mr
 #from interbotix_xs_modules.xs_robot.gripper import InterbotixGripperXS
 
 # The robot object is what you use to control the robot
 robot = InterbotixManipulatorXS("px100", "arm", "gripper")
 #robot_gripper = InterbotixGripperXS("px100","gripper")
 mode = 'h'
+
+#print(robot.arm.get_joint_commands())
+
+""" # Rotatioin matrix
+joints = robot.arm.get_joint_commands()
+T = mr.FKinSpace(robot.arm.robot_des.M, robot.arm.robot_des.Slist, joints)
+[R, p] = mr.TransToRp(T) # get the rotation matrix and the displacement
+print('T = ', T, '\n R = ', R, '\n p = ', p)
+"""
+
 # Let the user select the position
 while mode != 'q':
-    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [cb]ase, [acb]ase ")
+    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [cb]ase, [acb]ase, [wu]wrist up, [wd]wrist down, [wh]wrist horisontal, [eu]elbow up, [all]")
     if mode == "h":
         robot.arm.go_to_home_pose()
     elif mode == "s":
@@ -19,4 +31,14 @@ while mode != 'q':
     elif mode == "cb":
         robot.arm.set_single_joint_position('waist',-1.5)
     elif mode == "acb":
-        robot.arm.set_single_joint_position('waist',1.5, moving_time=1)
+        robot.arm.set_single_joint_position('waist',1.5, moving_time=2)
+    elif mode == "wu":
+        robot.arm.set_single_joint_position('wrist_angle',-1.0)
+    elif mode == "wd":
+        robot.arm.set_single_joint_position('wrist_angle',1.0)
+    elif mode == "wh":
+        robot.arm.set_single_joint_position('wrist_angle',0.0)
+    elif mode == "eu":
+        robot.arm.set_single_joint_position('elbow',-1.0)
+    elif mode == "all":
+        robot.arm.set_joint_positions([-1.0, -1.0, -1.0, 2.0],3) # [waist,shoulder,elbow,wrist]
