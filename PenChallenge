@@ -3,6 +3,7 @@
 #####################################################
 
 # First import the library for intel realsense sensor
+from gettext import ngettext
 import pyrealsense2 as rs
 # Import Numpy for easy array manipulation
 import numpy as np
@@ -66,7 +67,7 @@ print("Depth Scale is: " , depth_scale)
 
 # We will be removing the background of objects more than
 #  clipping_distance_in_meters meters away
-clipping_distance_in_meters = 1 #1 meter
+clipping_distance_in_meters = 0.4 # 1 = 1 meter
 clipping_distance = clipping_distance_in_meters / depth_scale # Calculates distance for camera
 
 # Create an align object
@@ -211,7 +212,7 @@ try:
         # #_, frame = cap.read()
         # # Convert BGR to HSV
         # #hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        hsv = cv.cvtColor(color_image, cv.COLOR_BGR2HSV)
+        hsv = cv.cvtColor(bg_removed, cv.COLOR_BGR2HSV)
         # # define range of blue color in HSV
         lower_purple = np.array([120,50,50])
         upper_purple = np.array([140,255,255])
@@ -232,11 +233,14 @@ try:
             maxcontour = max(contours, key = cv.contourArea)
             if len(maxcontour) > 15:
                 cv.drawContours(res, maxcontour, -1, (0,255,0), 3)
+                cv.drawContours(bg_removed, maxcontour, -1, (0,255,0), 3)
                 M = cv.moments(maxcontour)
                 cx = int(M['m10']/M['m00'])
                 cy = int(M['m01']/M['m00'])
                # print(cx, cy)
                 res = cv.circle(res, (cx,cy), radius=10, color=(0, 0, 255), thickness=-1)
+                bg_removed = cv.circle(bg_removed, (cx,cy), radius=10, color=(0, 0, 255), thickness=-1)
+
 
 
                 if cx < 480 and cy < 480 and depth_image[cx][cy] < 1000:
@@ -327,7 +331,7 @@ try:
         #   depth align to color on left
         #   depth on right
         depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth_image, alpha=0.03), cv.COLORMAP_JET)
-        images = np.hstack((bg_removed, depth_colormap))
+        images = np.hstack((color_image, depth_colormap))
 
         cv.namedWindow('Align Example', cv.WINDOW_NORMAL)
         cv.imshow('Align Example', images)

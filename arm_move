@@ -35,6 +35,9 @@ while mode != 'q':
         robot.arm.go_to_home_pose()
     elif mode == "s":
         robot.arm.go_to_sleep_pose()
+        [R, p] = get_gripper_pos()
+        print('\n p = ', p)
+    
     elif mode == "g":
         robot.gripper.grasp()
     elif mode == "r":
@@ -66,7 +69,8 @@ while mode != 'q':
         robot.arm.set_joint_positions(joint_positions,3) 
         print('T = ', T, '\n R = ', R, '\n p = ', p)
     elif mode == "cart":
-        robot.arm.set_ee_cartesian_trajectory(x = 0.030, z = 0.02 ) # Values should be meter/10
+        [R, p] = get_gripper_pos()
+        robot.arm.set_ee_cartesian_trajectory(x = 0.248 - p[0], z = 0.199 - p[2] ) # Values should be meter --- THIS IS RELATIVE TO CURRENT POSITION !!!
         [R, p] = get_gripper_pos()
         print('\n p = ', p)
     
