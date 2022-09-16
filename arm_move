@@ -17,9 +17,13 @@ T = mr.FKinSpace(robot.arm.robot_des.M, robot.arm.robot_des.Slist, joints)
 print('T = ', T, '\n R = ', R, '\n p = ', p)
 """
 
+joint_positions = [0.0, 0.0, 0.0, 0.0] # [waist,shoulder,elbow,wrist]
+Home_pose = [0.0, 0.0, 0.0, 0.0]
+Cobra_pose = [-1.0, -1.0, -1.0, 2.0]
+# joint_positions = [-1.0, -1.0, -1.0, 2.0] # Do the Cobra
 # Let the user select the position
 while mode != 'q':
-    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [cb]ase, [acb]ase, [wu]wrist up, [wd]wrist down, [wh]wrist horisontal, [eu]elbow up, [all]")
+    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [all], [cobra]")
     if mode == "h":
         robot.arm.go_to_home_pose()
     elif mode == "s":
@@ -28,17 +32,21 @@ while mode != 'q':
         robot.gripper.grasp()
     elif mode == "r":
         robot.gripper.release()
-    elif mode == "cb":
-        robot.arm.set_single_joint_position('waist',-1.5)
-    elif mode == "acb":
-        robot.arm.set_single_joint_position('waist',1.5, moving_time=2)
-    elif mode == "wu":
-        robot.arm.set_single_joint_position('wrist_angle',-1.0)
-    elif mode == "wd":
-        robot.arm.set_single_joint_position('wrist_angle',1.0)
-    elif mode == "wh":
-        robot.arm.set_single_joint_position('wrist_angle',0.0)
-    elif mode == "eu":
-        robot.arm.set_single_joint_position('elbow',-1.0)
+    # elif mode == "cb":
+    #     robot.arm.set_single_joint_position('waist',-1.5)
+    # elif mode == "acb":
+    #     robot.arm.set_single_joint_position('waist',1.5, moving_time=2)
+    # elif mode == "wu":
+    #     robot.arm.set_single_joint_position('wrist_angle',-1.0)
+    # elif mode == "wd":
+    #     robot.arm.set_single_joint_position('wrist_angle',1.0)
+    # elif mode == "wh":
+    #     robot.arm.set_single_joint_position('wrist_angle',0.0)
+    # elif mode == "eu":
+    #     robot.arm.set_single_joint_position('elbow',-1.0)
     elif mode == "all":
-        robot.arm.set_joint_positions([-1.0, -1.0, -1.0, 2.0],3) # [waist,shoulder,elbow,wrist]
+        joint_positions = Home_pose
+        robot.arm.set_joint_positions(joint_positions,3) 
+    elif mode == "cobra":
+        joint_positions = Cobra_pose
+        robot.arm.set_joint_positions(joint_positions,3) 
