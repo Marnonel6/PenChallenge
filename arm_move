@@ -30,7 +30,7 @@ Cobra_pose = [-1.0, -1.0, -1.0, 2.0]
 # joint_positions = [-1.0, -1.0, -1.0, 2.0] # Do the Cobra
 # Let the user select the position
 while mode != 'q':
-    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [all], [cobra], [cb], [acb], [cart]")
+    mode=input("[h]ome, [s]leep, [q]uit, [g]rasp, [r]elease, [all], [cobra], [cb], [acb], [cart]. [z], [x]")
     if mode == "h":
         robot.arm.go_to_home_pose()
     elif mode == "s":
@@ -70,7 +70,17 @@ while mode != 'q':
         print('T = ', T, '\n R = ', R, '\n p = ', p)
     elif mode == "cart":
         [R, p] = get_gripper_pos()
-        robot.arm.set_ee_cartesian_trajectory(x = 0.248 - p[0], z = 0.199 - p[2] ) # Values should be meter --- THIS IS RELATIVE TO CURRENT POSITION !!!
+        robot.arm.set_ee_cartesian_trajectory(x = 0.24 - p[0], z = 0.19 - p[2], moving_time=4) # Values should be meter --- THIS IS RELATIVE TO CURRENT POSITION !!!
+        [R, p] = get_gripper_pos()
+        print('\n p = ', p)
+    elif mode == "x":
+        [R, p] = get_gripper_pos()
+        robot.arm.set_ee_cartesian_trajectory(x = 0.07, moving_time=1) # Values should be meter --- THIS IS RELATIVE TO CURRENT POSITION !!!
+        [R, p] = get_gripper_pos()
+        print('\n p = ', p)
+    elif mode == "z":
+        [R, p] = get_gripper_pos()
+        robot.arm.set_ee_cartesian_trajectory(z = 0.01, moving_time=1) # Values should be meter --- THIS IS RELATIVE TO CURRENT POSITION !!!
         [R, p] = get_gripper_pos()
         print('\n p = ', p)
     

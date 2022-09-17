@@ -69,14 +69,14 @@ def robot_move(pen_coor):
     # [R, p] = get_gripper_pos()
     print('\n Px = ', Px, ' Py = ', Py, ' Pz = ', Pz)
 
-    print('\n p', p)
+    #print('\n p', p)
 
     
 
     theta = np.arctan(Py/Px)   #[Py-p[1]]/(Px-[p[0]])
     theta = float(theta + 0.1)
     print('\n theta = ', theta)
-    if theta < 0.3 and theta > -0.3 and (Current_angle_claw > theta+0.05 or Current_angle_claw < theta-0.05): # Check limits of theta and also if current angle of claw is further than +-0.5rads from desired position
+    if theta < 0.4 and theta > -0.4 and (Current_angle_claw > theta+0.05 or Current_angle_claw < theta-0.05): # Check limits of theta and also if current angle of claw is further than +-0.5rads from desired position
         robot.arm.set_single_joint_position('waist',theta)
     
     if Current_angle_claw < theta+0.05 or Current_angle_claw > theta-0.05: # Only move forward to pen when the angle is close to correct
@@ -124,26 +124,41 @@ def robot_move(pen_coor):
             
         """
 
+         # Close gripper when close to pen, z has a larger offset as x because when pen is in gripper z moves eather higher or lower.
+        if Pz - p[2] < 0.3 and Px - p[0] < 0.03:
+            robot.gripper.grasp()
+            time.sleep(2)
+            robot.arm.go_to_home_pose()
+            time.sleep(2)
+            robot.arm.go_to_sleep_pose()
+            time.sleep(2)
+            robot.arm.go_to_home_pose()
+            time.sleep(2)
+            robot.gripper.release()
+            time.sleep(2)
+            robot.arm.go_to_sleep_pose()
+            time.sleep(2)
+
         
         print("\n Pz - p[2] = ", Pz - p[2])
 
         if Pz - p[2] >= 0.01:
             if Pz - p[2] > 0.1 or Px - p[0] > 0.1:
-                robot.arm.set_ee_cartesian_trajectory(x = Px/2, z = Pz/2, moving_time=1 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+                robot.arm.set_ee_cartesian_trajectory(x = (Px-p[0])/2, z = (Pz-p[2])/2, moving_time=1 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
             elif Pz - p[2] <= 0.1 and Pz - p[2] > 0.01:
-                robot.arm.set_ee_cartesian_trajectory(z = 0.01) # THIS IS RELATIVE TO CURRENT POSITION !!!
-            elif Pz - p[2] <= 0.01 and Pz - p[2] > 0.07:
-                robot.arm.set_ee_cartesian_trajectory(z = 0.005 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+                robot.arm.set_ee_cartesian_trajectory(z = 0.05) # THIS IS RELATIVE TO CURRENT POSITION !!!
+            elif Pz - p[2] <= 0.01 and Pz - p[2] > 0.007:
+                robot.arm.set_ee_cartesian_trajectory(z = 0.01 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
 
         print("\n Px - p[0] = ", Px - p[0], '\n \n')
 
         if Pz - p[2] < 0.01:
             if Px - p[0] > 0.1:
-                robot.arm.set_ee_cartesian_trajectory(x = Px/2) # THIS IS RELATIVE TO CURRENT POSITION !!!
+                robot.arm.set_ee_cartesian_trajectory(x = (Px-p[0])/2) # THIS IS RELATIVE TO CURRENT POSITION !!!
             elif Px - p[0] <= 0.1 and Px - p[0] > 0.05:
-                robot.arm.set_ee_cartesian_trajectory(x = 0.01) # THIS IS RELATIVE TO CURRENT POSITION !!!
+                robot.arm.set_ee_cartesian_trajectory(x = 0.04) # THIS IS RELATIVE TO CURRENT POSITION !!!
             elif Px - p[0] <= 0.05 and Px - p[0] > 0.03:
-                robot.arm.set_ee_cartesian_trajectory(x = 0.005 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+                robot.arm.set_ee_cartesian_trajectory(x = 0.01 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
             # elif Pz - p[2] < 0.2 and Px - p[0] < 0.05:
             #     time.sleep(2)
             #     robot.arm.go_to_home_pose()
@@ -157,19 +172,20 @@ def robot_move(pen_coor):
             #     robot.arm.go_to_sleep_pose()
             #     time.sleep(2)
 
-        if Pz - p[2] < 0.2 and Px - p[0] < 0.05:
-            robot.gripper.grasp()
-            time.sleep(2)
-            robot.arm.go_to_home_pose()
-            time.sleep(2)
-            robot.arm.go_to_sleep_pose()
-            time.sleep(2)
-            robot.arm.go_to_home_pose()
-            time.sleep(2)
-            robot.gripper.release()
-            time.sleep(2)
-            robot.arm.go_to_sleep_pose()
-            time.sleep(2)
+        # Close gripper when close to pen, z has a larger offset as x because when pen is in gripper z moves eather higher or lower.
+        # if Pz - p[2] < 0.3 and Px - p[0] < 0.03:
+        #     robot.gripper.grasp()
+        #     time.sleep(2)
+        #     robot.arm.go_to_home_pose()
+        #     time.sleep(2)
+        #     robot.arm.go_to_sleep_pose()
+        #     time.sleep(2)
+        #     robot.arm.go_to_home_pose()
+        #     time.sleep(2)
+        #     robot.gripper.release()
+        #     time.sleep(2)
+        #     robot.arm.go_to_sleep_pose()
+        #     time.sleep(2)
             
 
     
@@ -440,6 +456,7 @@ try:
         
         if y < 1: # Sets robot to home position to start off at
             robot.arm.go_to_sleep_pose()
+            robot.gripper.release()
             y = 1
 
        # print('\n \n l =', l, '\n \n')
