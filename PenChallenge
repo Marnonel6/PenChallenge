@@ -49,6 +49,8 @@ def get_gripper_pos():
 def robot_move(pen_coor):
     [R, p] = get_gripper_pos()
 
+    print('\n Pen position = ', pen_coor, '\n')
+
     Current_angle_claw = np.arctan(p[1]/p[0])
 
 
@@ -66,7 +68,7 @@ def robot_move(pen_coor):
     # [R, p] = get_gripper_pos()
     print('\n Px = ', Px, ' Py = ', Py, ' Pz = ', Pz)
 
-    #print('\n p', p)
+    print('\n p', p)
 
     
 
@@ -76,9 +78,29 @@ def robot_move(pen_coor):
     if theta < 2 and theta > -2 and (Current_angle_claw > theta+0.05 or Current_angle_claw < theta-0.05): # Check limits of theta and also if current angle of claw is further than +-0.5rads from desired position
         robot.arm.set_single_joint_position('waist',theta)
     
-    if Current_angle_claw > theta+0.05 or Current_angle_claw < theta-0.05:
-        robot.arm.set_ee_cartesian_trajectory(x = (Px) ) # THIS IS RELATIVE TO CURRENT POSITION !!!
-        robot.arm.set_ee_cartesian_trajectory(z = (Pz) )
+    if Current_angle_claw < theta+0.05 or Current_angle_claw > theta-0.05: # Only move forward to pen when the angle is close to correct
+        #robot.arm.set_ee_cartesian_trajectory(x = (Px) ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+        #robot.arm.set_ee_cartesian_trajectory(z = (Pz) )
+        """
+        if p[0] < Px - 0.01:
+            robot.arm.set_ee_cartesian_trajectory(x = 0.01, moving_time=1 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+        elif p[0] < Px - 0.05:
+            robot.arm.set_ee_cartesian_trajectory(x = 0.05, moving_time=1 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+        elif p[0] < Px - 0.1:
+            robot.arm.set_ee_cartesian_trajectory(x = 0.1, moving_time=2 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+        """
+
+        
+        if Px - p[0] <= 0.08 and Px - p[0] > 0.01:
+            robot.arm.set_ee_cartesian_trajectory(x = 0.01, moving_time=1 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+        elif Px - p[0] <= 0.2 and Px - p[0] > 0.08:
+            robot.arm.set_ee_cartesian_trajectory(x = 0.05, moving_time=1 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+        elif Px - p[0] > 0.2:
+            robot.arm.set_ee_cartesian_trajectory(x = 0.1, moving_time=2 ) # THIS IS RELATIVE TO CURRENT POSITION !!!
+
+
+
+
     
 
 
@@ -135,7 +157,7 @@ depth_scale = depth_sensor.get_depth_scale()
 
 # We will be removing the background of objects more than
 #  clipping_distance_in_meters meters away
-clipping_distance_in_meters = 0.5 # 1 = 1 meter
+clipping_distance_in_meters = 0.4 # 1 = 1 meter
 clipping_distance = clipping_distance_in_meters / depth_scale # Calculates distance for camera
 
 # Create an align object
@@ -242,8 +264,8 @@ try:
                     if depth_coords != [0.0,0.0,0.0]:
                         pen_position = np.copy(depth_coords)
                         l = 1
-                        print('\n \n l =', l, '\n \n')
-                        print('\n Pen position = ', depth_coords, '\n')
+                        #print('\n \n l =', l, '\n \n')
+                        #print('\n Pen position = ', depth_coords, '\n')
                         #print(cx, cy)
 
         
@@ -342,11 +364,11 @@ try:
         #[R, p] = get_gripper_pos()
         #robot.arm.set_ee_cartesian_trajectory(x = 0.24 - p[0], z = 0.19 - p[2] ) # Values should be meter --- THIS IS RELATIVE TO CURRENT POSITION !!!
         #[R, p] = get_gripper_pos()
-        #print('\n p = ', p)
+        #print('\n p = ', p)7
 
         
         if y < 1: # Sets robot to home position to start off at
-            robot.arm.go_to_home_pose()
+            robot.arm.go_to_sleep_pose()
             y = 1
 
        # print('\n \n l =', l, '\n \n')
